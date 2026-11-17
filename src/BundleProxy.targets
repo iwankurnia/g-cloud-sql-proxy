@@ -1,0 +1,52 @@
+<Project>
+  <!--
+    Compresses Google's proxy for the target being built and embeds it, with its
+    checksum, as resources that BundledProxy.cs reads. The project sets
+    $(ProxyBinary) and $(ProxyVendorDir); tools\get-proxy.ps1 fills vendor\.
+  -->
+  <Target Name="BundleProxy" BeforeTargets="BeforeBuild" Condition="'$(ProxyBinary)' != '' And Exists('$(ProxyBinary)')">
+    <PropertyGroup>
+      <ProxyGz>$(IntermediateOutputPath)proxy.gz</ProxyGz>
+      <ProxyInfo>$(IntermediateOutputPath)proxy.info</ProxyInfo>
+    </PropertyGroup>
+    <CompressProxy Source="$(ProxyBinary)" VersionFile="$(ProxyVendorDir)version.txt" GzPath="$(ProxyGz)" InfoPath="$(ProxyInfo)" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(ProxyGz)" LogicalName="CloudSqlProxyManager.proxy.gz" />
+      <EmbeddedResource Include="$(ProxyInfo)" LogicalName="CloudSqlProxyManager.proxy.info" />
+    </ItemGroup>
+    <Message Importance="high" Text="Bundling $(ProxyBinary)" />
+  </Target>
+  <Target Name="WarnNoProxy" BeforeTargets="BeforeBuild" Condition="'$(RuntimeIdentifier)' != '' And '$(ProxyBinary)' != '' And !Exists('$(ProxyBinary)')">
+    <Warning Text="No proxy at $(ProxyBinary): building WITHOUT a built-in proxy. Run tools\get-proxy.ps1 first." />
+  </Target>
+
+  <UsingTask TaskName="CompressProxy" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Source ParameterType="System.String" Required="true" />
+      <VersionFile ParameterType="System.String" Required="true" />
+      <GzPath ParameterType="System.String" Required="true" />
+      <InfoPath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.IO.Compression" />
+      <Using Namespace="System.Security.Cryptography" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var src = new FileInfo(Source);
+        var gz = new FileInfo(GzPath);
+        if (!gz.Exists || gz.LastWriteTimeUtc < src.LastWriteTimeUtc)
+        {
+            Directory.CreateDirectory(gz.DirectoryName);
+            using (var input = src.OpenRead())
+            using (var output = File.Create(GzPath))
+            using (var zip = new GZipStream(output, CompressionLevel.Optimal))
+                input.CopyTo(zip);
+        }
+        string sha;
+        using (var s = src.OpenRead()) sha = BitConverter.ToString(SHA256.Create().ComputeHash(s)).Replace("-", "").ToLowerInvariant();
+        string version = File.Exists(VersionFile) ? File.ReadAllText(VersionFile).Trim() : "unknown";
+        File.WriteAllText(InfoPath, "version=" + version + "\nsha256=" + sha + "\nsize=" + src.Length + "\n");
+      ]]></Code>
+    </Task>
+  </UsingTask>
+</Project>

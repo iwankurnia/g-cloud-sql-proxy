@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>CloudSqlProxyManager</AssemblyName>
+    <RootNamespace>CloudSqlProxyManager</RootNamespace>
+    <ApplicationIcon>..\..\assets\app.ico</ApplicationIcon>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+    <!-- Where the build looks for Google's proxy to bundle (filled by tools\get-proxy.ps1). -->
+    <ProxyVendorDir>$(MSBuildThisFileDirectory)..\..\vendor\$(RuntimeIdentifier)\</ProxyVendorDir>
+    <ProxyBinary Condition="'$(RuntimeIdentifier)' != '' And $(RuntimeIdentifier.StartsWith('win'))">$(ProxyVendorDir)cloud-sql-proxy.exe</ProxyBinary>
+    <ProxyBinary Condition="'$(RuntimeIdentifier)' != '' And !$(RuntimeIdentifier.StartsWith('win'))">$(ProxyVendorDir)cloud-sql-proxy</ProxyBinary>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.23" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.23" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.23" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.23" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.23" Condition="'$(Configuration)' == 'Debug'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <AvaloniaResource Include="..\..\assets\icon-*.png" Link="assets\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <Import Project="..\BundleProxy.targets" />
+</Project>

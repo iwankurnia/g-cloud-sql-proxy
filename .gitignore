@@ -1,0 +1,8 @@
+bin/
+obj/
+dist/
+# Google's binaries are fetched by tools\get-proxy.ps1, never committed
+vendor/
+# Never commit saved settings or a key file by accident
+*.settings.json
+*-key.json

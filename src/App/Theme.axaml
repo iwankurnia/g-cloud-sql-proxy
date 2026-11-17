@@ -1,0 +1,206 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <!-- Palette: white surfaces, navy accent, state colours in the status band -->
+    <Color x:Key="InkColor">#202124</Color>
+    <Color x:Key="LabelColor">#3C4043</Color>
+    <Color x:Key="MutedColor">#5F6368</Color>
+    <Color x:Key="HairlineColor">#E1E4E8</Color>
+    <Color x:Key="NavyColor">#162239</Color>
+    <Color x:Key="NavyHoverColor">#2C3E5E</Color>
+    <Color x:Key="NavyDownColor">#0C1424</Color>
+    <Color x:Key="AccentColor">#2563EB</Color>
+    <Color x:Key="GoodColor">#1E8E3E</Color>
+    <Color x:Key="BusyColor">#F29900</Color>
+    <Color x:Key="BadColor">#D93025</Color>
+    <Color x:Key="OffColor">#94A3B8</Color>
+    <Color x:Key="OffTintColor">#F5F6F8</Color>
+    <Color x:Key="BusyTintColor">#FEF7E0</Color>
+    <Color x:Key="GoodTintColor">#E6F4EA</Color>
+    <Color x:Key="BadTintColor">#FCE8E6</Color>
+    <Color x:Key="LogBackColor">#FAFAFB</Color>
+
+    <SolidColorBrush x:Key="InkBrush" Color="{StaticResource InkColor}" />
+    <SolidColorBrush x:Key="LabelBrush" Color="{StaticResource LabelColor}" />
+    <SolidColorBrush x:Key="MutedBrush" Color="{StaticResource MutedColor}" />
+    <SolidColorBrush x:Key="HairlineBrush" Color="{StaticResource HairlineColor}" />
+    <SolidColorBrush x:Key="NavyBrush" Color="{StaticResource NavyColor}" />
+    <SolidColorBrush x:Key="NavyHoverBrush" Color="{StaticResource NavyHoverColor}" />
+    <SolidColorBrush x:Key="NavyDownBrush" Color="{StaticResource NavyDownColor}" />
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="GoodBrush" Color="{StaticResource GoodColor}" />
+    <SolidColorBrush x:Key="BusyBrush" Color="{StaticResource BusyColor}" />
+    <SolidColorBrush x:Key="BadBrush" Color="{StaticResource BadColor}" />
+    <SolidColorBrush x:Key="OffBrush" Color="{StaticResource OffColor}" />
+    <SolidColorBrush x:Key="OffTintBrush" Color="{StaticResource OffTintColor}" />
+    <SolidColorBrush x:Key="BusyTintBrush" Color="{StaticResource BusyTintColor}" />
+    <SolidColorBrush x:Key="GoodTintBrush" Color="{StaticResource GoodTintColor}" />
+    <SolidColorBrush x:Key="BadTintBrush" Color="{StaticResource BadTintColor}" />
+    <SolidColorBrush x:Key="LogBackBrush" Color="{StaticResource LogBackColor}" />
+  </Styles.Resources>
+
+  <Style Selector="Window">
+    <Setter Property="Background" Value="White" />
+    <Setter Property="FontFamily" Value="fonts:Inter#Inter" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+
+  <Style Selector="TextBlock.heading">
+    <Setter Property="FontSize" Value="15" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource NavyBrush}" />
+    <Setter Property="Margin" Value="0,0,0,10" />
+  </Style>
+  <Style Selector="TextBlock.field">
+    <Setter Property="Foreground" Value="{StaticResource LabelBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+  <Style Selector="TextBlock.hint">
+    <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+    <Setter Property="FontSize" Value="12.5" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBlock.state">
+    <Setter Property="FontSize" Value="19" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="TextBlock.detail">
+    <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+
+  <!-- Inputs: a light hairline border, square-ish corners, navy focus ring -->
+  <Style Selector="TextBox, AutoCompleteBox, ComboBox, NumericUpDown">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="BorderBrush" Value="#C4C7CC" />
+  </Style>
+  <Style Selector="AutoCompleteBox /template/ TextBox">
+    <Setter Property="MinHeight" Value="32" />
+  </Style>
+
+  <!-- Buttons: outlined by default, filled navy when "primary" -->
+  <Style Selector="Button">
+    <Setter Property="MinHeight" Value="30" />
+    <Setter Property="MinWidth" Value="92" />
+    <Setter Property="CornerRadius" Value="5" />
+    <Setter Property="Padding" Value="14,0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Background" Value="White" />
+    <Setter Property="BorderBrush" Value="#C4C7CC" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="Button:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#F3F4F6" />
+    <Setter Property="BorderBrush" Value="#C4C7CC" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="Button:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#E8EAED" />
+    <Setter Property="BorderBrush" Value="#C4C7CC" />
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+  <Style Selector="Button:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="#F3F4F6" />
+    <Setter Property="BorderBrush" Value="#E4E6EA" />
+    <Setter Property="Foreground" Value="#A0A5AB" />
+  </Style>
+
+  <Style Selector="Button.primary">
+    <Setter Property="Background" Value="{StaticResource NavyBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource NavyBrush}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource NavyHoverBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource NavyHoverBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+  <Style Selector="Button.primary:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="{StaticResource NavyDownBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource NavyDownBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="Button.action">
+    <Setter Property="MinWidth" Value="124" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="FontSize" Value="13.5" />
+  </Style>
+
+  <!-- The chevron inside a type-or-choose field: flat, no box of its own -->
+  <Style Selector="Button.chevron">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0,4,4,0" />
+  </Style>
+  <Style Selector="Button.chevron /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Button.chevron:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="#F3F4F6" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Button.chevron:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="#E8EAED" />
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="Button.chevron:disabled /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Opacity" Value="0.4" />
+  </Style>
+
+  <!-- Text that acts as a link -->
+  <Style Selector="Button.link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.link:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+    <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+  </Style>
+  <Style Selector="Button.link:pressed /template/ ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+  </Style>
+
+  <Style Selector="CheckBox">
+    <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+  </Style>
+
+  <!-- The activity log -->
+  <Style Selector="TextBox.log">
+    <Setter Property="FontFamily" Value="Consolas, Menlo, DejaVu Sans Mono, monospace" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Background" Value="{StaticResource LogBackBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource LabelBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="10,8" />
+    <Setter Property="IsReadOnly" Value="True" />
+    <Setter Property="AcceptsReturn" Value="True" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style Selector="TextBox.log:focus /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+  </Style>
+  <Style Selector="TextBox.log:pointerover /template/ Border#PART_BorderElement">
+    <Setter Property="BorderBrush" Value="{StaticResource HairlineBrush}" />
+    <Setter Property="Background" Value="{StaticResource LogBackBrush}" />
+  </Style>
+</Styles>

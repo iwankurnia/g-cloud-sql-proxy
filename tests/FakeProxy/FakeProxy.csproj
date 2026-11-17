@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- Short on purpose: Linux reports process names truncated to 15 characters. -->
+    <AssemblyName>fakeproxy</AssemblyName>
+    <RootNamespace>CloudSqlProxyManager.Tests</RootNamespace>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+</Project>

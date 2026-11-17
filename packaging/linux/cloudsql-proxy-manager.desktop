@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Cloud SQL Proxy Manager
+Comment=Open a tunnel to a Google Cloud SQL instance and keep it open
+Exec=CloudSqlProxyManager
+Icon=cloudsql-proxy-manager
+Terminal=false
+Categories=Development;Database;Network;
+Keywords=cloud;sql;proxy;mysql;tunnel;
+StartupWMClass=CloudSqlProxyManager

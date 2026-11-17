@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>ControllerTests</AssemblyName>
+    <RootNamespace>CloudSqlProxyManager.Tests</RootNamespace>
+    <SelfContained>true</SelfContained>
+    <DebugType>none</DebugType>
+    <!-- The tests exercise the bundled proxy, so they carry it too. -->
+    <ProxyVendorDir>$(MSBuildThisFileDirectory)..\vendor\$(RuntimeIdentifier)\</ProxyVendorDir>
+    <ProxyBinary Condition="'$(RuntimeIdentifier)' != '' And $(RuntimeIdentifier.StartsWith('win'))">$(ProxyVendorDir)cloud-sql-proxy.exe</ProxyBinary>
+    <ProxyBinary Condition="'$(RuntimeIdentifier)' != '' And !$(RuntimeIdentifier.StartsWith('win'))">$(ProxyVendorDir)cloud-sql-proxy</ProxyBinary>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\Core\Core.csproj" />
+    <Compile Remove="FakeProxy\**" />
+  </ItemGroup>
+  <Import Project="..\src\BundleProxy.targets" />
+</Project>
