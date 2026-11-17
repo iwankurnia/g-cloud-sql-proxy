@@ -88,9 +88,11 @@ foreach ($rid in $Targets) {
         New-Item -ItemType Directory -Force $stage | Out-Null
         Copy-Item (Join-Path $out 'CloudSqlProxyManager') $stage
         Copy-Item (Join-Path $root 'assets\app-256.png') (Join-Path $stage 'cloudsql-proxy-manager.png')
-        Copy-Item (Join-Path $root 'packaging\linux\cloudsql-proxy-manager.desktop') $stage
-        Copy-Item (Join-Path $root 'packaging\linux\install.sh') $stage
-        Copy-Item (Join-Path $root 'packaging\linux\README.txt') $stage
+        # Text files for Linux get Unix line endings whatever the checkout did to them.
+        foreach ($name in 'cloudsql-proxy-manager.desktop', 'install.sh', 'README.txt') {
+            $text = [System.IO.File]::ReadAllText((Join-Path $root "packaging\linux\$name")) -replace "`r`n", "`n"
+            [System.IO.File]::WriteAllText((Join-Path $stage $name), $text, (New-Object System.Text.UTF8Encoding($false)))
+        }
         Write-TarGz (Join-Path $dist "CloudSqlProxyManager-$rid.tar.gz") (Split-Path $stage) @('CloudSqlProxyManager', 'install.sh')
         Remove-Item (Split-Path $stage) -Recurse -Force
     }
@@ -101,9 +103,10 @@ foreach ($rid in $Targets) {
         New-Item -ItemType Directory -Force "$app\Contents\MacOS", "$app\Contents\Resources" | Out-Null
         Copy-Item (Join-Path $out 'CloudSqlProxyManager') "$app\Contents\MacOS\"
         Copy-Item (Join-Path $root 'assets\app.icns') "$app\Contents\Resources\app.icns"
-        (Get-Content (Join-Path $root 'packaging\macos\Info.plist') -Raw).Replace('{VERSION}', $version) |
-            Set-Content "$app\Contents\Info.plist" -Encoding UTF8 -NoNewline
-        Copy-Item (Join-Path $root 'packaging\macos\README.txt') $stageRoot
+        $plist = ([System.IO.File]::ReadAllText((Join-Path $root 'packaging\macos\Info.plist')) -replace "`r`n", "`n").Replace('{VERSION}', $version)
+        [System.IO.File]::WriteAllText("$app\Contents\Info.plist", $plist, (New-Object System.Text.UTF8Encoding($false)))
+        $readme = [System.IO.File]::ReadAllText((Join-Path $root 'packaging\macos\README.txt')) -replace "`r`n", "`n"
+        [System.IO.File]::WriteAllText((Join-Path $stageRoot 'README.txt'), $readme, (New-Object System.Text.UTF8Encoding($false)))
         Write-TarGz (Join-Path $dist "CloudSqlProxyManager-$rid.tar.gz") $stageRoot @('CloudSqlProxyManager')
         Remove-Item $stageRoot -Recurse -Force
     }

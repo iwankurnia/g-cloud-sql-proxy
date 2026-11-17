@@ -1,0 +1,10 @@
+# Files that run on Linux or macOS must keep Unix line endings on every checkout.
+*.sh            text eol=lf
+*.desktop       text eol=lf
+*.plist         text eol=lf
+Dockerfile      text eol=lf
+packaging/**/README.txt text eol=lf
+# Binary assets
+*.png  binary
+*.ico  binary
+*.icns binary
