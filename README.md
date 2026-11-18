@@ -56,6 +56,25 @@ the program (or in the settings folder) with one `project:region:instance` per l
 Anything you connect to is also remembered under **Saved**, with its port, key file
 and options.
 
+## IAM database login
+
+Tick **Log in to the database with IAM (--auto-iam-authn)** to sign in to MySQL as a
+Google identity instead of a database user with a password. The app passes
+`--auto-iam-authn` to the proxy, which fetches a short-lived token for every connection.
+
+- **Database user**: the line under the option shows it. With a key file it is the
+  service account without the `.gserviceaccount.com` ending, for example
+  `sql-reader@my-project.iam`; without a key file it is your own Google account email.
+  Leave the password empty in DBeaver or your client.
+- **One-off set-up on the Google side** (not something the app can do): the instance
+  needs the `cloudsql_iam_authentication` flag on, the identity must be added as an IAM
+  database user on the instance, it needs the *Cloud SQL Instance User* role, and it
+  needs MySQL grants like any other user.
+- The choice is saved with each connection, so one instance can use IAM and another a
+  password.
+
+![IAM login](docs/iam-login.png)
+
 ## Two instances at once
 
 Start the app twice. Each window is its own tunnel on its own local port. A second
@@ -102,7 +121,7 @@ After a reconnect your database client has to open a new connection; the old one
 The built-in proxy is unpacked on first connect (about 37 MB) and checked against its
 SHA-256 every time the app starts using it. To use a different proxy, choose it under
 **Advanced options > Proxy program**. **Extra arguments** is passed to the proxy as
-typed, e.g. `--private-ip` or `--auto-iam-authn`.
+typed, e.g. `--private-ip`.
 
 Other things worth knowing:
 

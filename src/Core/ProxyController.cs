@@ -24,6 +24,8 @@ namespace CloudSqlProxyManager
         public int Port;
         public string CredentialsFile;
         public string ExtraArgs;
+        /// <summary>Log in to the database as the IAM principal: the proxy's --auto-iam-authn.</summary>
+        public bool AutoIamAuthn;
     }
 
     /// <summary>
@@ -128,6 +130,7 @@ namespace CloudSqlProxyManager
             {
                 args.Add("--credentials-file=" + o.CredentialsFile.Trim());
             }
+            if (o.AutoIamAuthn) args.Add("--auto-iam-authn");
             if (!string.IsNullOrWhiteSpace(o.ExtraArgs))
             {
                 foreach (string extra in SplitArgs(o.ExtraArgs)) args.Add(extra);

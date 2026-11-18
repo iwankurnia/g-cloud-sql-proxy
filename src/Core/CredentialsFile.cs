@@ -36,6 +36,14 @@ namespace CloudSqlProxyManager
             return info;
         }
 
+        /// <summary>The IAM database user for a key: the service account without ".gserviceaccount.com".</summary>
+        public static string IamDatabaseUser(string clientEmail)
+        {
+            if (string.IsNullOrEmpty(clientEmail)) return null;
+            const string suffix = ".gserviceaccount.com";
+            return clientEmail.EndsWith(suffix) ? clientEmail.Substring(0, clientEmail.Length - suffix.Length) : clientEmail;
+        }
+
         public string Summary()
         {
             if (Problem != null) return Problem;

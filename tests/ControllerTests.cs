@@ -107,10 +107,12 @@ internal static class ControllerTests
         using (Rig rig = new Rig())
         {
             ProxyOptions o = rig.Options("--private-ip");
+            o.AutoIamAuthn = true;
             rig.Controller.Connect(o);
             WaitState(rig, ProxyState.Connected);
             Check(FakePids().Length == 1, "one proxy process is running");
-            Check(WaitFor(() => rig.Saw("arg[3]=--private-ip"), 2000), "all arguments arrived");
+            Check(WaitFor(() => rig.Saw("arg[4]=--private-ip"), 2000), "all arguments arrived");
+            Check(rig.Saw("arg[3]=--auto-iam-authn"), "IAM login flag is passed when asked for");
             Check(rig.Saw("arg[0]=my-project:asia-southeast2:my-instance"), "instance connection name is argument 0");
             Check(rig.Saw("arg[1]=--port=45991"), "port argument");
             Check(rig.Saw("arg[2]=--credentials-file=" + o.CredentialsFile), "key path with spaces stays one argument");
@@ -325,8 +327,14 @@ internal static class ControllerTests
                 "it runs and reports " + BundledProxy.Version + ": " + output);
         }
 
-        // A damaged copy must be replaced, not run. (Delete first: Linux refuses to
-        // overwrite a program file that was executed moments ago.)
+        // A damaged copy must be replaced, not run. Never touch it while a real
+        // tunnel is using it: that copy is shared with the app.
+        if (InUse(path))
+        {
+            Console.WriteLine("    skip  damage check: the shared copy is in use by a running tunnel");
+            return;
+        }
+        // Delete first: Linux refuses to overwrite a program file executed moments ago.
         File.Delete(path);
         File.WriteAllText(path, "not a program");
         typeof(BundledProxy).GetField("_verifiedPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).SetValue(null, null);
@@ -356,6 +364,20 @@ internal static class ControllerTests
             Check(rig.Count("Connected") == 0, "never claimed to be connected");
             rig.Controller.Disconnect();
             Check(rig.Controller.State == ProxyState.Disconnected, "disconnect stops the retries");
+        }
+    }
+
+    /// <summary>True when another process (a running tunnel) has the file open.</summary>
+    private static bool InUse(string path)
+    {
+        try
+        {
+            using (FileStream s = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;
         }
     }
 

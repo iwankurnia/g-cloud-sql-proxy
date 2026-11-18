@@ -132,7 +132,7 @@ function Seed-Settings([bool]$hide) {
 @"
 {"ProxyPath":"","AutoReconnect":true,"HideOnConnect":$h,"Connections":[
  {"Project":"my-project","Region":"asia-southeast2","Instance":"orders-db-replica-1","Port":$portA,"CredentialsFile":"$keyJson","ExtraArgs":""},
- {"Project":"my-project","Region":"asia-southeast2","Instance":"orders-db-replica-2","Port":$portB,"CredentialsFile":"$keyJson","ExtraArgs":""}]}
+ {"Project":"my-project","Region":"asia-southeast2","Instance":"orders-db-replica-2","Port":$portB,"CredentialsFile":"$keyJson","ExtraArgs":"","AutoIamAuthn":true}]}
 "@ | Set-Content -Path (Join-Path $demo 'CloudSqlProxyManager.settings.json') -Encoding ASCII
 }
 # The window must stay visible for the screenshots; hide-on-connect gets its own check at the end.
@@ -230,6 +230,10 @@ try {
     Press $w2 'ActionButton'
     Check (Wait-Text $w2 'StateText' 'Connected' 10) 'second copy connects on its own port'
     Check ((Fake-Pids).Count -eq 2) 'two proxies running side by side'
+    Check ((Text $w2 'IamHint') -eq 'Database user: sql-reader@my-project.iam   (leave the password empty)') "IAM login names the database user from the key file: $(Text $w2 'IamHint')"
+    $log2 = (Find $w2 'LogBox').GetCurrentPattern([System.Windows.Automation.ValuePattern]::Pattern).Current.Value
+    Check ($log2 -like '*--auto-iam-authn*') 'the proxy was started with --auto-iam-authn'
+    Check ((Text $w2 'DetailText') -like '*IAM login as sql-reader@my-project.iam*') "the status line names the IAM user: $(Text $w2 'DetailText')"
     Start-Sleep -Milliseconds 800
     [Shot]::Save($app2.MainWindowHandle, (Join-Path $OutDir '5-second-copy-connected.png'))
 

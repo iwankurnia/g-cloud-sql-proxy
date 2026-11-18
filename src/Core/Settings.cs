@@ -14,6 +14,7 @@ namespace CloudSqlProxyManager
         public int Port { get; set; }
         public string CredentialsFile { get; set; }
         public string ExtraArgs { get; set; }
+        public bool AutoIamAuthn { get; set; }
 
         public string ConnectionName()
         {

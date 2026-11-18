@@ -46,6 +46,7 @@ namespace CloudSqlProxyManager
         private bool _closing;
         private bool _confirmedClose;
         private string _activeInstance;
+        private string _activeIamUser;
         private int _activePort;
         private int _suggestedPort;
         private int _portHintSerial;
@@ -253,6 +254,7 @@ namespace CloudSqlProxyManager
             PortBox.Value = Math.Max(1, Math.Min(65535, p.Port));
             KeyBox.Text = p.CredentialsFile ?? "";
             ExtraBox.Text = p.ExtraArgs ?? "";
+            IamBox.IsChecked = p.AutoIamAuthn;
             SyncLists(false, true);
             _loading = false;
             if ((ExtraBox.Text ?? "").Trim().Length > 0) SetAdvancedOpen(true);
@@ -397,6 +399,7 @@ namespace CloudSqlProxyManager
             PortSuggest.Click += delegate { if (_suggestedPort > 0) PortBox.Value = _suggestedPort; };
 
             KeyBox.TextChanged += delegate { UpdateKeyHint(); };
+            IamBox.PropertyChanged += (s, e) => { if (e.Property == CheckBox.IsCheckedProperty) UpdateIamHint(); };
             KeyBrowse.Click += async delegate { await BrowseKey(); };
             AdvancedToggle.Click += delegate { SetAdvancedOpen(!_advancedOpen); };
             ProxyBox.TextChanged += delegate { UpdateProxyHint(); };
@@ -547,15 +550,18 @@ namespace CloudSqlProxyManager
             if (path.Length == 0)
             {
                 SetHint(KeyHint, "Leave empty to use your own gcloud login (application-default credentials).", "MutedBrush");
+                UpdateIamHint();
                 return;
             }
             if (!File.Exists(path))
             {
                 SetHint(KeyHint, "File not found.", "BadBrush");
+                UpdateIamHint();
                 return;
             }
             CredentialsInfo info = CredentialsInfo.Read(path);
             SetHint(KeyHint, info.Summary(), info.Problem != null ? "BadBrush" : "MutedBrush");
+            UpdateIamHint();
             if (info.ProjectId != null && Text(ProjectBox).Length == 0) ProjectBox.Text = info.ProjectId;
         }
 
@@ -583,6 +589,23 @@ namespace CloudSqlProxyManager
             {
                 SetHint(ProxyHint, BundledProxy.IsAvailable ? "This file is used instead of the built-in proxy." : "", "MutedBrush");
             }
+        }
+
+        /// <summary>With IAM login the database user is the IAM principal, not a database account.</summary>
+        private void UpdateIamHint()
+        {
+            bool on = IamBox.IsChecked == true;
+            IamHint.IsVisible = on;
+            if (on) IamHint.Text = "Database user: " + IamDatabaseUser() + "   (leave the password empty)";
+        }
+
+        /// <summary>The key's service account without ".gserviceaccount.com", or your own Google account.</summary>
+        private string IamDatabaseUser()
+        {
+            string path = CleanPath(KeyBox.Text);
+            string user = null;
+            if (path.Length > 0 && File.Exists(path)) user = CredentialsInfo.IamDatabaseUser(CredentialsInfo.Read(path).ClientEmail);
+            return user ?? "your Google account email";
         }
 
         private void SetHint(TextBlock block, string text, string brushKey)
@@ -713,12 +736,14 @@ namespace CloudSqlProxyManager
             profile.Port = port;
             profile.CredentialsFile = key;
             profile.ExtraArgs = (ExtraBox.Text ?? "").Trim();
+            profile.AutoIamAuthn = IamBox.IsChecked == true;
 
             _settings = SettingsStore.SaveConnection(profile, typedProxy, AutoBox.IsChecked == true, HideBox.IsChecked == true);
             RefreshSavedList(profile.Key());
 
             _activeInstance = instance;
             _activePort = port;
+            _activeIamUser = profile.AutoIamAuthn ? IamDatabaseUser() : null;
 
             ProxyOptions options = new ProxyOptions();
             options.ProxyPath = proxy;
@@ -726,6 +751,7 @@ namespace CloudSqlProxyManager
             options.Port = port;
             options.CredentialsFile = key;
             options.ExtraArgs = profile.ExtraArgs;
+            options.AutoIamAuthn = profile.AutoIamAuthn;
 
             _controller.AutoReconnect = AutoBox.IsChecked == true;
             _controller.Connect(options);
@@ -794,7 +820,8 @@ namespace CloudSqlProxyManager
                     break;
                 case ProxyState.Connected:
                     text = "Connected"; light = "GoodBrush"; tint = "GoodTintBrush";
-                    if (string.IsNullOrEmpty(detail)) detail = _activeInstance + " is available at 127.0.0.1:" + _activePort;
+                    if (string.IsNullOrEmpty(detail)) detail = _activeInstance + " is available at 127.0.0.1:" + _activePort
+                        + (_activeIamUser != null ? "  ·  IAM login as " + _activeIamUser : "");
                     break;
                 case ProxyState.Reconnecting:
                     text = "Reconnecting…"; light = "BadBrush"; tint = "BadTintBrush";
@@ -827,6 +854,7 @@ namespace CloudSqlProxyManager
             ExtraBox.IsEnabled = idle;
             AutoBox.IsEnabled = idle;
             HideBox.IsEnabled = idle;
+            IamBox.IsEnabled = idle;
             if (_trayConnect != null) _trayConnect.IsEnabled = idle;
             if (_trayDisconnect != null) _trayDisconnect.IsEnabled = !idle;
 
